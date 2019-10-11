@@ -1,6 +1,7 @@
 package com.example.thiago.testeparse.Activity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -82,9 +83,16 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_compartilhar:
                 compartilharFotos();
                 return true;
+            case R.id.action_compartilhar_camera:
+                abrircamera();
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void abrircamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePictureIntent, 2);
     }
 
     private void compartilharFotos(){
@@ -100,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Bitmap imagem = MediaStore.Images.Media.getBitmap(getContentResolver(), localImagemSelecionada);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                imagem.compress(Bitmap.CompressFormat.PNG, 75, stream);
+                imagem.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
@@ -128,6 +136,37 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else{
+            Bundle extras = data.getExtras();
+
+            Bitmap imagem = (Bitmap) extras.get("data");
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imagem.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
+            String nomeImagem = dateFormat.format(new Date());
+            ParseFile arquivoParse = new ParseFile(nomeImagem+"imagem.png",byteArray);
+
+            ParseObject parseObject = new ParseObject("Imagem");
+            parseObject.put("username", ParseUser.getCurrentUser().getUsername());
+            parseObject.put("imagem", arquivoParse);
+            parseObject.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e==null){
+                        Toast.makeText(getApplicationContext(), "Sua Imagem foi postada",
+                                Toast.LENGTH_SHORT).show();
+                        TabsAdapter adapterNovo = (TabsAdapter) viewPager.getAdapter();
+                        HomeFragment homeFragmentNovo = (HomeFragment) adapterNovo.getFragment(0);
+                        homeFragmentNovo.atualizaPostagens();
+                    }else{
+                        Toast.makeText(getApplicationContext(), "Erro ao postar imagem - Tente Novamente!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
         }
     }
 

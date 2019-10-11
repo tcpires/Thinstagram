@@ -52,7 +52,7 @@ public class HomeFragment extends Fragment {
 
     private void  getPostagens(){
         query = ParseQuery.getQuery("Imagem");
-        query.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
+//        query.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
         query.orderByDescending("createdAt");
 
         query.findInBackground(new FindCallback<ParseObject>() {

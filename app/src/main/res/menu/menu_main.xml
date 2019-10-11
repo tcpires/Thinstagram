@@ -17,5 +17,10 @@
         android:icon="@drawable/ic_action_camera"
         android:orderInCategory="300"
         app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_compartilhar_camera"
+        android:title="@string/action_compartilhar"
+        android:icon="@drawable/ic_action_camera"
+        android:orderInCategory="300"
+        app:showAsAction="ifRoom"/>
 
 </menu>
