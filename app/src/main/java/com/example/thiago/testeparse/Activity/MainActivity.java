@@ -1,16 +1,22 @@
 package com.example.thiago.testeparse.Activity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatImageHelper;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,28 +26,27 @@ import com.example.thiago.testeparse.R;
 import com.example.thiago.testeparse.adapter.TabsAdapter;
 import com.example.thiago.testeparse.fragments.HomeFragment;
 import com.example.thiago.testeparse.util.SlidingTabLayout;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
 
     private Toolbar toolbarPrincipal;
     private SlidingTabLayout slidingTabLayout;
     private ViewPager viewPager;
+    private String mCurrentPhotoPathFirst;
+    private String mTempPhotoPathFirst;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         slidingTabLayout.setDistributeEvenly(true);
         slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(this, R.color.cinzaEscuro));
         slidingTabLayout.setViewPager(viewPager);
+
+
 
     }
 
@@ -84,15 +91,31 @@ public class MainActivity extends AppCompatActivity {
                 compartilharFotos();
                 return true;
             case R.id.action_compartilhar_camera:
-                abrircamera();
+                getTakenImageFirst();
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void abrircamera() {
+    private void getTakenImageFirst() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(takePictureIntent, 2);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile;
+            try {
+                photoFile = ImageHelper.createImageFile();
+            } catch (IOException e) {
+                return;
+            }
+            if (photoFile == null) {
+                return;
+            }
+            mTempPhotoPathFirst = photoFile.getAbsolutePath();
+            Uri photoUri =
+                    FileProvider.getUriForFile(
+                            this, getApplicationContext().getPackageName() + ".provider", photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+            startActivityForResult(takePictureIntent, 2);
+        }
     }
 
     private void compartilharFotos(){
@@ -136,17 +159,17 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else{
-            Bundle extras = data.getExtras();
-
-            Bitmap imagem = (Bitmap) extras.get("data");
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            imagem.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
+        } else {
+            mCurrentPhotoPathFirst = mTempPhotoPathFirst;
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
             String nomeImagem = dateFormat.format(new Date());
-            ParseFile arquivoParse = new ParseFile(nomeImagem+"imagem.png",byteArray);
+            ParseFile arquivoParse = null;
+            try {
+                arquivoParse = new ParseFile(nomeImagem + "imagem.png", ImageHelper.getFileBytes(new File(mCurrentPhotoPathFirst)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             ParseObject parseObject = new ParseObject("Imagem");
             parseObject.put("username", ParseUser.getCurrentUser().getUsername());
@@ -154,22 +177,20 @@ public class MainActivity extends AppCompatActivity {
             parseObject.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-                    if(e==null){
+                    if (e == null) {
                         Toast.makeText(getApplicationContext(), "Sua Imagem foi postada",
                                 Toast.LENGTH_SHORT).show();
                         TabsAdapter adapterNovo = (TabsAdapter) viewPager.getAdapter();
                         HomeFragment homeFragmentNovo = (HomeFragment) adapterNovo.getFragment(0);
                         homeFragmentNovo.atualizaPostagens();
-                    }else{
+                    } else {
                         Toast.makeText(getApplicationContext(), "Erro ao postar imagem - Tente Novamente!",
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
             });
-
         }
     }
-
     private void deslogarUsuario () {
         ParseUser.logOut();
         Intent intent = new Intent(this, LoginActivity.class);
@@ -177,3 +198,4 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 }
+

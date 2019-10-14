@@ -53,7 +53,6 @@ public class HomeAdapter extends ArrayAdapter<ParseObject> {
 
             Picasso.with(context)
                     .load(parseObject.getParseFile("imagem").getUrl())
-                    .fit()
                     .into(imagemPostagem);
         }
 

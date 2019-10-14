@@ -14,7 +14,7 @@
         app:showAsAction="never"/>
     <item android:id="@+id/action_compartilhar"
         android:title="@string/action_compartilhar"
-        android:icon="@drawable/ic_action_camera"
+        android:icon="@drawable/ic_photo_library_black_24dp"
         android:orderInCategory="300"
         app:showAsAction="ifRoom"/>
     <item android:id="@+id/action_compartilhar_camera"
