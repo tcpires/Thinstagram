@@ -6,16 +6,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.AppCompatImageHelper;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private String mCurrentPhotoPathFirst;
     private String mTempPhotoPathFirst;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
 
     @Override
@@ -60,14 +64,14 @@ public class MainActivity extends AppCompatActivity {
         slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tab_main);
         viewPager = (ViewPager) findViewById(R.id.view_pager_main);
 
-        TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager(),this);
+        TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager(), this);
         viewPager.setAdapter(tabsAdapter);
         slidingTabLayout.setCustomTabView(R.layout.tab_view, R.id.text_item_tab);
         slidingTabLayout.setDistributeEvenly(true);
         slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(this, R.color.cinzaEscuro));
         slidingTabLayout.setViewPager(viewPager);
 
-
+        verifyStoragePermissions(this);
 
     }
 
@@ -81,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_sair:
-                deslogarUsuario ();
+                deslogarUsuario();
                 return true;
             case R.id.action_configuracoes:
                 return true;
@@ -118,39 +122,46 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void compartilharFotos(){
-        Intent intent =new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+    private void compartilharFotos() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, 1);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==1 && resultCode==RESULT_OK && data!=null){
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             Uri localImagemSelecionada = data.getData();
+            String imageFile = getRealPathFromURI(localImagemSelecionada);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
+            String nomeImagem = dateFormat.format(new Date());
+            ParseObject parseObject = new ParseObject("Imagem");
             try {
-                Bitmap imagem = MediaStore.Images.Media.getBitmap(getContentResolver(), localImagemSelecionada);
+                Bitmap imagem = MediaStore.Images.Media
+                        .getBitmap(getContentResolver(), localImagemSelecionada);
+                ExifInterface exif = new ExifInterface(imageFile);
+
+                int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                Bitmap imgRotate = ImageHelper.rotateBitmap(imagem, rotation);
+
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                imagem.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                imgRotate.compress(Bitmap.CompressFormat.PNG, 70, stream);
+
                 byte[] byteArray = stream.toByteArray();
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
-                String nomeImagem = dateFormat.format(new Date());
-                ParseFile arquivoParse = new ParseFile(nomeImagem+"imagem.png",byteArray);
-
-                ParseObject parseObject = new ParseObject("Imagem");
+                ParseFile arquivoParse = new ParseFile(nomeImagem + "imagem.png", byteArray);
                 parseObject.put("username", ParseUser.getCurrentUser().getUsername());
                 parseObject.put("imagem", arquivoParse);
                 parseObject.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
-                        if(e==null){
+                        if (e == null) {
                             Toast.makeText(getApplicationContext(), "Sua Imagem foi postada",
                                     Toast.LENGTH_SHORT).show();
                             TabsAdapter adapterNovo = (TabsAdapter) viewPager.getAdapter();
                             HomeFragment homeFragmentNovo = (HomeFragment) adapterNovo.getFragment(0);
                             homeFragmentNovo.atualizaPostagens();
-                        }else{
+                        } else {
                             Toast.makeText(getApplicationContext(), "Erro ao postar imagem - Tente Novamente!",
                                     Toast.LENGTH_SHORT).show();
                         }
@@ -162,40 +173,75 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mCurrentPhotoPathFirst = mTempPhotoPathFirst;
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
-            String nomeImagem = dateFormat.format(new Date());
-            ParseFile arquivoParse = null;
+            Bitmap imageBmp = ImageHelper.decodeSampledBitmapFromResource
+                    (mCurrentPhotoPathFirst, 300, 300);
             try {
-                arquivoParse = new ParseFile(nomeImagem + "imagem.png", ImageHelper.getFileBytes(new File(mCurrentPhotoPathFirst)));
+                ExifInterface exif = new ExifInterface(mCurrentPhotoPathFirst);
+                int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+                Bitmap imgRotate = ImageHelper.rotateBitmap(imageBmp, rotation);
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                imgRotate.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
+                String nomeImagem = dateFormat.format(new Date());
+                ParseFile arquivoParse = new ParseFile(nomeImagem + "imagem.png", byteArray);
+
+                ParseObject parseObject = new ParseObject("Imagem");
+                parseObject.put("username", ParseUser.getCurrentUser().getUsername());
+                parseObject.put("imagem", arquivoParse);
+                parseObject.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Toast.makeText(getApplicationContext(), "Sua Imagem foi postada",
+                                    Toast.LENGTH_SHORT).show();
+                            TabsAdapter adapterNovo = (TabsAdapter) viewPager.getAdapter();
+                            HomeFragment homeFragmentNovo = (HomeFragment) adapterNovo.getFragment(0);
+                            homeFragmentNovo.atualizaPostagens();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Erro ao postar imagem - Tente Novamente!",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            ParseObject parseObject = new ParseObject("Imagem");
-            parseObject.put("username", ParseUser.getCurrentUser().getUsername());
-            parseObject.put("imagem", arquivoParse);
-            parseObject.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        Toast.makeText(getApplicationContext(), "Sua Imagem foi postada",
-                                Toast.LENGTH_SHORT).show();
-                        TabsAdapter adapterNovo = (TabsAdapter) viewPager.getAdapter();
-                        HomeFragment homeFragmentNovo = (HomeFragment) adapterNovo.getFragment(0);
-                        homeFragmentNovo.atualizaPostagens();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Erro ao postar imagem - Tente Novamente!",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
         }
     }
-    private void deslogarUsuario () {
+
+    private void deslogarUsuario() {
         ParseUser.logOut();
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
+    }
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
 }
 
