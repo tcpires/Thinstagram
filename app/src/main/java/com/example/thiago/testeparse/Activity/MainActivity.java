@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-        } else {
+        } else if(requestCode == 2 && resultCode == RESULT_OK && data != null){
             mCurrentPhotoPathFirst = mTempPhotoPathFirst;
 
             Bitmap imageBmp = ImageHelper.decodeSampledBitmapFromResource
@@ -213,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else{
+            return;
         }
     }
 
