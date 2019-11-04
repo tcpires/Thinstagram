@@ -1,8 +1,8 @@
 package com.example.thiago.testeparse.Activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,11 +33,11 @@ public class CadastroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro);
 
-        textoUsuario = (EditText) findViewById(R.id.edit_login_usuario);
-        textoEmail = (EditText) findViewById(R.id.text_email);
-        textoSenha = (EditText) findViewById(R.id.text_senha);
-        botaoCadastrar = (Button) findViewById(R.id.button_logar);
-        facaLogin = (TextView) findViewById(R.id.text_faca_login);
+        textoUsuario = findViewById(R.id.edit_login_usuario);
+        textoEmail = findViewById(R.id.text_email);
+        textoSenha = findViewById(R.id.text_senha);
+        botaoCadastrar = findViewById(R.id.button_logar);
+        facaLogin = findViewById(R.id.text_faca_login);
 
 
         botaoCadastrar.setOnClickListener(new View.OnClickListener() {
@@ -49,12 +49,12 @@ public class CadastroActivity extends AppCompatActivity {
         facaLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               abrirLoginUsuario();
+                abrirLoginUsuario();
             }
         });
     }
 
-    private void cadastrarUsuario(){
+    private void cadastrarUsuario() {
         ParseUser usuario = new ParseUser();
         usuario.setUsername(textoUsuario.getText().toString());
         usuario.setEmail(textoEmail.getText().toString());
@@ -63,23 +63,21 @@ public class CadastroActivity extends AppCompatActivity {
         usuario.signUpInBackground(new SignUpCallback() {
             @Override
             public void done(ParseException e) {
-                if (e==null) {
-                    Toast.makeText(CadastroActivity.this,"Sucesso ao cadastrar usuario", Toast.LENGTH_SHORT).show();
+                if (e == null) {
+                    Toast.makeText(CadastroActivity.this, "Sucesso ao cadastrar usuario", Toast.LENGTH_SHORT).show();
                     abrirLoginUsuario();
-                }else {
+                } else {
                     ParseErros parseErros = new ParseErros();
                     String erro = parseErros.getErro(e.getCode());
-                    Toast.makeText(CadastroActivity.this,erro, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CadastroActivity.this, erro, Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
     }
 
-
-   private void abrirLoginUsuario (){
-       Intent intent = new Intent(CadastroActivity.this, LoginActivity.class);
-       startActivity(intent);
-       finish();
-   }
+    private void abrirLoginUsuario() {
+        Intent intent = new Intent(CadastroActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
