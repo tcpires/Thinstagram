@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,17 +26,12 @@ import com.example.thiago.testeparse.fragments.HomeFragment;
 import com.example.thiago.testeparse.util.SlidingTabLayout;
 import com.parse.ParseUser;
 
-import java.io.File;
-import java.io.IOException;
-
 public class MainActivity extends AppCompatActivity {
 
 
     private Toolbar toolbarPrincipal;
     private SlidingTabLayout slidingTabLayout;
     private ViewPager viewPager;
-    private String mCurrentPhotoPathFirst;
-    private String mTempPhotoPathFirst;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -52,10 +46,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         toolbarPrincipal = findViewById(R.id.toolbar_principal);
-//        toolbarPrincipal.setLogo(R.drawable.instagramlogo);
 
         toolbarPrincipal.setTitle("Fabio & Isabely");
-        toolbarPrincipal.setTitleTextColor(R.color.preto);
 
         setSupportActionBar(toolbarPrincipal);
 
@@ -87,43 +79,26 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_sair:
                 deslogarUsuario();
                 return true;
-//            case R.id.action_configuracoes:
-//                return true;
             case R.id.action_compartilhar:
-                compartilharFotos();
+                initIntentTakenPicture();
                 return true;
             case R.id.action_compartilhar_camera:
-                getTakenImageFirst();
+                initIntentTakenPhoto();
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void getTakenImageFirst() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile;
-            try {
-                photoFile = ImageHelper.createImageFile();
-            } catch (IOException e) {
-                return;
-            }
-            if (photoFile == null) {
-                return;
-            }
-            mTempPhotoPathFirst = photoFile.getAbsolutePath();
-            Uri photoUri =
-                    FileProvider.getUriForFile(
-                            this, getApplicationContext().getPackageName() + ".provider", photoFile);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-
-            startActivityForResult(takePictureIntent, 2);
-        }
+    private void initIntentTakenPhoto() {
+        Intent goToTakePhoto = new Intent(this, PostImageActivity.class);
+        goToTakePhoto.putExtra("localRequest", 1);
+        startActivity(goToTakePhoto);
     }
 
-    private void compartilharFotos() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, 1);
+    private void initIntentTakenPicture() {
+        Intent goToTakePhoto = new Intent(this, PostImageActivity.class);
+        goToTakePhoto.putExtra("localRequest", 2);
+        startActivity(goToTakePhoto);
     }
 
     @Override
@@ -140,7 +115,8 @@ public class MainActivity extends AppCompatActivity {
 
             startActivity(intent);
 
-        } else if(requestCode == 2){
+        } else if (requestCode == 2) {
+            String mTempPhotoPathFirst = null;
             Intent intent = getIntent(requestCode, resultCode, mTempPhotoPathFirst);
             startActivity(intent);
 

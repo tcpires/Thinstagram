@@ -8,6 +8,8 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -22,18 +24,21 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PostImageActivity extends AppCompatActivity {
 
+    private static final int PHOTO_CAMERA = 5;
+    private static final int PHOTO_GALERY = 6;
+    private static int LOCAL_REQUEST = 0;
     private ImageView photo;
     private Button btPostar;
-    private String nomeImagem = null;
-    private String photoPath = null;
+    private String mCurrentPhotoPathFirst;
+    private String mTempPhotoPathFirst;
     private ExifInterface exif = null;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
 
 
     @Override
@@ -41,43 +46,85 @@ public class PostImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_image);
 
-        int requestCode = getIntent().getExtras().getInt("requestCode");
-        int resultCode = getIntent().getExtras().getInt("resultCode");
-        photoPath = getIntent().getExtras().getString("photoPath");
-
         photo = findViewById(R.id.foto_postagem);
         btPostar = findViewById(R.id.bt_postar);
-        nomeImagem= dateFormat.format(new Date());
 
-        takeImageFromDevice(requestCode, resultCode);
-
+        if(LOCAL_REQUEST==0 & getIntent().getExtras() != null){
+            LOCAL_REQUEST = getIntent().getExtras().getInt("localRequest");
+    }
+        if (LOCAL_REQUEST == 1) {
+            getTakenImageFirst();
+        } else if (LOCAL_REQUEST == 2) {
+            compartilharFotos();
+        }
     }
 
-    public void takeImageFromDevice(int requestCode, int resultCode) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            Uri uri = Uri.parse(getIntent().getExtras().getString("uri"));
+    private void getTakenImageFirst() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile;
+            try {
+                photoFile = ImageHelper.createImageFile();
+            } catch (IOException e) {
+                return;
+            }
+            if (photoFile == null) {
+                return;
+            }
+            mTempPhotoPathFirst = photoFile.getAbsolutePath();
+            Uri photoUri =
+                    FileProvider.getUriForFile(
+                            this, getApplicationContext().getPackageName() + ".provider", photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
 
-            Bitmap imgRotate = getBitmapFromUri(uri);
+            startActivityForResult(takePictureIntent, PHOTO_CAMERA);
+        }
+    }
 
-            final byte[] byteArray = getBytes(imgRotate);
+    private void compartilharFotos() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PHOTO_GALERY);
+    }
 
-            final ParseObject parseObject = new ParseObject("Imagem");
-            final ParseFile arquivoParse = new ParseFile(nomeImagem + "imagem.png", byteArray);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PHOTO_GALERY) {
+            Uri localImagemSelecionada = data.getData();
+
+            Bitmap imagem = getBitmapFromUri(localImagemSelecionada);
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imagem.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
+            String nomeImagem = dateFormat.format(new Date());
+            ParseFile arquivoParse = new ParseFile(nomeImagem + "imagem.png", byteArray);
+
+            ParseObject parseObject = new ParseObject("Imagem");
             parseObject.put("username", ParseUser.getCurrentUser().getUsername());
             parseObject.put("imagem", arquivoParse);
-
             postarImagem(parseObject);
-        } else if (requestCode == 2){
 
-            Bitmap imgRotate = getBitmapFromString(photoPath);
 
-            final byte[] byteArray = getBytes(imgRotate);
+        } else if (requestCode == PHOTO_CAMERA) {
 
-            final ParseObject parseObject = new ParseObject("Imagem");
-            final ParseFile arquivoParse = new ParseFile(nomeImagem + "imagem.png", byteArray);
+            mCurrentPhotoPathFirst = mTempPhotoPathFirst;
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("ddmmaaahhmmss");
+            String nomeImagem = dateFormat.format(new Date());
+            Bitmap imagem = getBitmapFromString(mTempPhotoPathFirst);
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imagem.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            ParseFile arquivoParse = new ParseFile(nomeImagem + "imagem.png", byteArray);
+
+            ParseObject parseObject = new ParseObject("Imagem");
             parseObject.put("username", ParseUser.getCurrentUser().getUsername());
             parseObject.put("imagem", arquivoParse);
-
             postarImagem(parseObject);
         }
     }
@@ -102,12 +149,6 @@ public class PostImageActivity extends AppCompatActivity {
             }
 
         });
-    }
-
-    private byte[] getBytes(Bitmap imgRotate) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        imgRotate.compress(Bitmap.CompressFormat.PNG, 70, stream);
-        return stream.toByteArray();
     }
 
     private Bitmap getBitmapFromUri(Uri uri) {
@@ -157,6 +198,6 @@ public class PostImageActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        finish();
+     //   finish();
     }
 }
