@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/fabinho_isa"
+    tools:context="com.example.thiago.testeparse.Activity.LoginActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/relativeLayout">
+
+
+    <EditText
+        android:id="@+id/edit_login_usuario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/estilo_botao"
+        android:padding="16dp"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:hint="Digite o seu Login"
+        android:textColorHint="#FFFFFF"
+        android:textStyle="bold"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text=""
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:id="@+id/edit_login_senha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_login_usuario"
+        android:padding="16dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/estilo_botao"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:hint="Digite a sua senha"
+        android:textColorHint="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/button_logar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_login_senha"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/estilo_botao"
+        android:layout_marginTop="10dp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:text="Logar" />
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:padding="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/button_logar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:onClick="abrirCadastroUsuario"
+            android:background="@drawable/estilo_botao"
+            android:text="Não tem conta? Crie uma!"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

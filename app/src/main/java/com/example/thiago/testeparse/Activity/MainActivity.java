@@ -1,6 +1,7 @@
 package com.example.thiago.testeparse.Activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -44,13 +45,18 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.CAMERA
     };
 
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         toolbarPrincipal = findViewById(R.id.toolbar_principal);
-        toolbarPrincipal.setLogo(R.drawable.instagramlogo);
+//        toolbarPrincipal.setLogo(R.drawable.instagramlogo);
+
+        toolbarPrincipal.setTitle("Fabio & Isabely");
+        toolbarPrincipal.setTitleTextColor(R.color.preto);
+
         setSupportActionBar(toolbarPrincipal);
 
         slidingTabLayout = findViewById(R.id.sliding_tab_main);
@@ -81,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_sair:
                 deslogarUsuario();
                 return true;
-            case R.id.action_configuracoes:
-                return true;
+//            case R.id.action_configuracoes:
+//                return true;
             case R.id.action_compartilhar:
                 compartilharFotos();
                 return true;

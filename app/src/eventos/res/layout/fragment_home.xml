@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="@drawable/fundo_degrade"
+    android:background="@drawable/fabinho_isa_main"
     tools:context="com.example.thiago.testeparse.fragments.HomeFragment">
 
     <ListView

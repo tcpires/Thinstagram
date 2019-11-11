@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activity.MainActivity">
+
+    <item android:id="@+id/action_sair"
+        android:title="@string/action_sair"
+        android:orderInCategory="200"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_compartilhar"
+        android:title="@string/action_compartilhar"
+        android:icon="@drawable/ic_photo_library_black_24dp"
+        android:orderInCategory="300"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_compartilhar_camera"
+        android:title="@string/action_compartilhar"
+        android:icon="@drawable/ic_action_camera"
+        android:orderInCategory="300"
+        app:showAsAction="ifRoom"/>
+
+</menu>

@@ -16,6 +16,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    flavorDimensions("version")
+    productFlavors{
+        eventos{
+            buildConfigField("String", "BACK4APP_APP_ID", "\"5BiBeoxCYIAmBZ57Kzzya4khTCB9lEYEN7KFAaRR\"")
+            buildConfigField("String", "BACK4APP_CLIENT_KEY", "\"T6PQ37GcyBDjqndENPhpJa6JpIkEG5Yiq43EHjew\"")
+            buildConfigField("String", "BACK4APP_SERVER", "\"https://parseapi.back4app.com/\"")
+
+        }
+        original{
+            buildConfigField("String", "BACK4APP_APP_ID", "\"5BiBeoxCYIAmBZ57Kzzya4khTCB9lEYEN7KFAaRR\"")
+            buildConfigField("String", "BACK4APP_CLIENT_KEY", "\"T6PQ37GcyBDjqndENPhpJa6JpIkEG5Yiq43EHjew\"")
+            buildConfigField("String", "BACK4APP_SERVER", "\"https://parseapi.back4app.com/\"")
+
+        }
+    }
+
+
 }
 
 dependencies {
