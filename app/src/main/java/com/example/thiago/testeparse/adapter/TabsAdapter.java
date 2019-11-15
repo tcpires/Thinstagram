@@ -21,7 +21,7 @@ import java.util.HashMap;
 public class TabsAdapter extends FragmentStatePagerAdapter {
 
     private Context context;
-    private int[] icones = new int[]{R.drawable.ic_action_home, R.drawable.ic_people};
+    private int[] icones = new int[]{R.drawable.ic_action_home};
     private  int tamanhoIcone;
     private HashMap<Integer, Fragment> fragmentosUtilizados = new HashMap<>();
 

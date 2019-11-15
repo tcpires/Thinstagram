@@ -2,15 +2,15 @@ package com.example.thiago.testeparse.Activity;
 
 
 import android.app.Application;
-import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.SaveCallback;
 
-public class StarterApplication extends Application{
+import static com.example.thiago.testeparse.BuildConfig.BACK4APP_APP_ID;
+import static com.example.thiago.testeparse.BuildConfig.BACK4APP_CLIENT_KEY;
+import static com.example.thiago.testeparse.BuildConfig.BACK4APP_SERVER;
+
+public class StarterApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
@@ -18,16 +18,15 @@ public class StarterApplication extends Application{
         Parse.enableLocalDatastore(this);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("5BiBeoxCYIAmBZ57Kzzya4khTCB9lEYEN7KFAaRR")
-                .clientKey("T6PQ37GcyBDjqndENPhpJa6JpIkEG5Yiq43EHjew")
-                .server("https://parseapi.back4app.com/")
-        .build()
+                .applicationId(BACK4APP_APP_ID)
+                .clientKey(BACK4APP_CLIENT_KEY)
+                .server(BACK4APP_SERVER)
+                .build()
         );
 
         ParseACL defaultACL = new ParseACL();
         defaultACL.setPublicReadAccess(true);
         defaultACL.setPublicWriteAccess(true);
-
 
 
     }

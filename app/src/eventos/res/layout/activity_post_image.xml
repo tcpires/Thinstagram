@@ -4,22 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundo_degrade"
+    android:background="@drawable/fabinho_isa_main"
     android:padding="10dp"
     tools:context=".Activity.PostImageActivity">
 
+    <ProgressBar
+        android:id="@+id/pbPostagem"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/foto_postagem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:indeterminateTint="#c5c5c5"/>
+
+
     <ImageView
         android:id="@+id/foto_postagem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginBottom="20dp"
         android:adjustViewBounds="true"
         android:minHeight="300dp"
         android:maxHeight="400dp"
-        android:maxWidth="400dp"
         android:scaleType="fitCenter"
         tools:src="@tools:sample/backgrounds/scenic"
-        app:layout_constraintTop_toBottomOf="@+id/txtAgradecimentos"
         app:layout_constraintBottom_toTopOf="@+id/bt_postar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,13 +39,14 @@
         android:id="@+id/txtAgradecimentos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Obrigado por compartilhar desse momento conosco"
+        android:text="@string/agradecimentos"
         android:textStyle="bold"
         app:fontFamily="@font/architects_daughter"
-        app:layout_constraintBottom_toTopOf="@+id/foto_postagem"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="25dp"
+        android:layout_marginTop="20dp"/>
 
     <Button
         android:id="@+id/bt_postar"
@@ -47,8 +58,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="20dp"
-         />
+        android:layout_marginBottom="10dp"
+        />
+
 
 
 </android.support.constraint.ConstraintLayout>
