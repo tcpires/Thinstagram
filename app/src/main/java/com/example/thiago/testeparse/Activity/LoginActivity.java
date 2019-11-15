@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         botaoLogar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String usuario = editLoginUsuario.getText().toString();
                 String senha = editLoginSenha.getText().toString();
 

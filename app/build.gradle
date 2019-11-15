@@ -19,8 +19,8 @@ android {
     flavorDimensions("version")
     productFlavors{
         eventos{
-            buildConfigField("String", "BACK4APP_APP_ID", "\"5BiBeoxCYIAmBZ57Kzzya4khTCB9lEYEN7KFAaRR\"")
-            buildConfigField("String", "BACK4APP_CLIENT_KEY", "\"T6PQ37GcyBDjqndENPhpJa6JpIkEG5Yiq43EHjew\"")
+            buildConfigField("String", "BACK4APP_APP_ID", "\"EkvI0Z95BClDsggh0TevlICiaZW7KJt34BnTCToE\"")
+            buildConfigField("String", "BACK4APP_CLIENT_KEY", "\"GMOaBZRu02BRUwrEey9gmz45lLZc2mBUzQbDX486\"")
             buildConfigField("String", "BACK4APP_SERVER", "\"https://parseapi.back4app.com/\"")
 
         }
@@ -40,7 +40,6 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
 
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.parse:parse-android:1.15.7'

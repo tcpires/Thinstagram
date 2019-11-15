@@ -1,5 +1,6 @@
 package com.example.thiago.testeparse.Activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.thiago.testeparse.R;
@@ -39,6 +41,7 @@ public class PostImageActivity extends AppCompatActivity {
     private String mCurrentPhotoPathFirst;
     private String mTempPhotoPathFirst;
     private ExifInterface exif = null;
+    private ProgressBar pbPostagem;
 
 
     @Override
@@ -48,6 +51,8 @@ public class PostImageActivity extends AppCompatActivity {
 
         photo = findViewById(R.id.foto_postagem);
         btPostar = findViewById(R.id.bt_postar);
+        pbPostagem = findViewById(R.id.pbPostagem);
+        pbPostagem.setVisibility(View.GONE);
 
         if(LOCAL_REQUEST==0 & getIntent().getExtras() != null){
             LOCAL_REQUEST = getIntent().getExtras().getInt("localRequest");
@@ -89,7 +94,7 @@ public class PostImageActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PHOTO_GALERY) {
+        if (requestCode == PHOTO_GALERY && data != null) {
             Uri localImagemSelecionada = data.getData();
 
             Bitmap imagem = getBitmapFromUri(localImagemSelecionada);
@@ -108,7 +113,7 @@ public class PostImageActivity extends AppCompatActivity {
             postarImagem(parseObject);
 
 
-        } else if (requestCode == PHOTO_CAMERA) {
+        } else if (requestCode == PHOTO_CAMERA && mCurrentPhotoPathFirst==null) {
 
             mCurrentPhotoPathFirst = mTempPhotoPathFirst;
 
@@ -127,6 +132,14 @@ public class PostImageActivity extends AppCompatActivity {
             parseObject.put("imagem", arquivoParse);
             postarImagem(parseObject);
         }
+        else {
+            returnToMain();
+        }
+    }
+
+    private void returnToMain() {
+        final Intent returnIntent = new Intent(this, MainActivity.class);
+        startActivityForResult(returnIntent, 0);
     }
 
     private void postarImagem(final ParseObject parseObject) {
@@ -134,12 +147,13 @@ public class PostImageActivity extends AppCompatActivity {
         btPostar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                pbPostagem.setVisibility(View.VISIBLE);
                 parseObject.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
                             startActivityForResult(returnIntent, 3);
+                            finish();
                         } else {
                             Toast.makeText(getApplicationContext(), "Erro ao postar imagem - Tente Novamente!",
                                     Toast.LENGTH_SHORT).show();
@@ -147,7 +161,6 @@ public class PostImageActivity extends AppCompatActivity {
                     }
                 });
             }
-
         });
     }
 
@@ -186,18 +199,12 @@ public class PostImageActivity extends AppCompatActivity {
 
     private String getRealPathFromURI(Uri contentURI) {
         Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
+        if (cursor == null) {
             return contentURI.getPath();
         } else {
             cursor.moveToFirst();
             int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             return cursor.getString(idx);
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-     //   finish();
     }
 }

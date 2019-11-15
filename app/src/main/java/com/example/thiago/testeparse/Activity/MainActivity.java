@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -48,21 +47,15 @@ public class MainActivity extends AppCompatActivity {
         toolbarPrincipal = findViewById(R.id.toolbar_principal);
 
         toolbarPrincipal.setTitle("Fabio & Isabely");
+        toolbarPrincipal.setTitleTextColor(R.color.preto);
 
         setSupportActionBar(toolbarPrincipal);
 
         slidingTabLayout = findViewById(R.id.sliding_tab_main);
         viewPager = findViewById(R.id.view_pager_main);
-
         TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager(), this);
         viewPager.setAdapter(tabsAdapter);
-        slidingTabLayout.setCustomTabView(R.layout.tab_view, R.id.text_item_tab);
-        slidingTabLayout.setDistributeEvenly(true);
-        slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(this, R.color.cinzaEscuro));
-        slidingTabLayout.setViewPager(viewPager);
-
         verifyStoragePermissions(this);
-
     }
 
     @Override
@@ -120,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = getIntent(requestCode, resultCode, mTempPhotoPathFirst);
             startActivity(intent);
 
-        } else if (requestCode == 3) {
+        } else if (requestCode == 3 && requestCode == 0) {
             TabsAdapter adapterNovo = (TabsAdapter) viewPager.getAdapter();
             HomeFragment homeFragmentNovo = (HomeFragment) adapterNovo.getFragment(0);
             homeFragmentNovo.atualizaPostagens();

@@ -8,42 +8,47 @@
     android:padding="10dp"
     tools:context=".Activity.PostImageActivity">
 
-    <TextView
-        android:id="@+id/autor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:paddingTop="5dp"
-        android:text="Nome do autor"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageView
         android:id="@+id/foto_postagem"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:adjustViewBounds="true"
         android:minHeight="300dp"
+        android:maxHeight="400dp"
+        android:maxWidth="400dp"
         android:scaleType="fitCenter"
-        app:layout_constraintTop_toBottomOf="@+id/autor"
         tools:src="@tools:sample/backgrounds/scenic"
-
+        app:layout_constraintTop_toBottomOf="@+id/txtAgradecimentos"
+        app:layout_constraintBottom_toTopOf="@+id/bt_postar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         />
+
+    <TextView
+        android:id="@+id/txtAgradecimentos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Obrigado por compartilhar desse momento conosco"
+        android:textStyle="bold"
+        app:fontFamily="@font/architects_daughter"
+        app:layout_constraintBottom_toTopOf="@+id/foto_postagem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/bt_postar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/estilo_botao_logar"
-        android:text="Postar"
+        android:text="Compartilhar"
         android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/foto_postagem" />
+        android:layout_marginBottom="20dp"
+         />
 
 
 </android.support.constraint.ConstraintLayout>
